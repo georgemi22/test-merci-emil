@@ -1,0 +1,136 @@
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <div id="VContainer" class="col-md-6 offset-md-3">
+    <div class="card">
+        <div class="card-header">
+            <h1>Tasks</h1>
+        </div>
+        <div class="card-body">
+            <template v-if="obj1 !== null">
+            <ul class="list-group">
+             
+                <div v-for="(user,index) in obj1.contracts">
+                <li class="list-group-item d-flex justify-content-between align-items-center" >
+                    <span v-html="user.firstname"></span>
+                    <span v-html="user.lastname"></span>
+                    <span v-html="user.email"></span>
+                    <span v-html="user.phone"></span>
+           
+                    <a v-bind:href="'/delete-contact/' + index" class="btn btn-danger">Delete</a>
+                    <button type="button" class="btn btn-primary" v-on:click="setUserToModify(index)" data-toggle="modal" data-target="#exampleModal">Update</button>
+                </li>
+                </div>
+            </ul>
+            </template>
+            <template v-else>
+                <p>No Contacts Yet.</p>
+            </template>
+        </div>
+
+        <div class="card-footer">
+            <form action="/new-contact" method="POST">
+                <div class="form-group">
+                    <input type="text" name="firstname" placeholder="Firstname" class="form-control" autofocus>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="lastname" placeholder="Lastname" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="tel" name="phone" placeholder="Phone" class="form-control">
+                </div>
+                <button class="btn btn-primary btn-block">
+                    Add
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+                <div class="form-group">
+                    <input type="text" id="update_firstname" placeholder="Firstname" class="form-control" autofocus>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="update_lastname" placeholder="Lastname" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="email" id="update_email" placeholder="email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="update_phone" placeholder="Phone" class="form-control">
+                </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" v-on:click="update()" >Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+</body>
+
+</html>
+<script>
+    const VM = new Vue({
+        // Asta e id-ul elementului din DOM de care e legat instanta asta de Vue
+        el : "#VContainer",
+        // Aici sunt datele salvate de catre instanta
+        data : {
+            userToModify : null,
+            obj1 : [],
+            obj2 : null
+        },
+        methods:{
+            update:    function(){
+                console.log("Here we update");
+                axios.post("/updateContracts",{ index : this.userToModify }).then(function(response){
+                    console.log(JSON.stringify(response.data));
+                })
+            },
+            setUserToModify:    function(index){
+                      console.log("Update");
+                let that = this;
+                that.userToModify = index;
+            }
+        },
+        created(){
+            let that = this;
+            console.log("created() function call");
+            axios.get("/getContracts").then(function(response){
+                that.obj1 = response.data;
+                console.log("====>  The response is : " + JSON.stringify(response.data));
+            });
+        }
+    });
+    // mai ruleaza odata x2
+    // mda .. nu-ti gaseste acea ruta de GET... o secunda sa ma uit , poate imi dau seama
+    // stai asa , vreau sa compar o chestie cu rutele de la mine din licenta
+    // acum ai documentele salvate in vue , ideea e urmatoarea , din ce vad eu , ele au numele alea ciudate... ma gandesc sa le 
+    // sorteze / ordonezi dupa inste indecsi...whatever 
+    // si gen , randezi asa
+
+    // nu inteleg la ce te referi...
+</script>
